@@ -1,6 +1,6 @@
 # How to Run "Unmapped" (3D Reconstruction Engine — Phase 3)
 
-This guide provides step-by-step instructions for setting up, running, testing, and troubleshooting the **Unmapped** 3D Terrain Reconstruction Engine (Phase 3 of SIH26158).
+This guide provides step-by-step instructions for setting up, running, testing, and troubleshooting the complete **Unmapped** Phase 1–5 platform.
 
 ---
 
@@ -33,14 +33,14 @@ source venv/bin/activate
 ## 2. Installing Dependencies
 
 ### 2.1 Core Dependencies (CPU-Only / Mock Run)
-For running the standalone mock mode and pipeline scaffold (no GPU or model weights needed):
+For the complete portable pipeline (no GPU or model weights needed):
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-*Core packages installed:* `numpy`, `scipy`, `opencv-python`, `Pillow`, `PyYAML`, `tqdm`.
+*Core packages installed:* `numpy`, `scipy`, `opencv-python`, `Pillow`, `PyYAML`, `tqdm`, `pyproj`, `open3d`, `fastapi`, `uvicorn`, and `python-multipart`.
 
 ### 2.2 Optional Hardware Accelerations (For Real Data & GPU)
 Install these depending on your system capabilities:
@@ -52,20 +52,27 @@ pip install "torch>=2.0" transformers
 # 2. For real 3D Gaussian Splatting radiance field training (requires CUDA):
 pip install "torch>=2.0" gsplat
 
-# 3. For enhanced point cloud I/O & meshing:
-pip install open3d
+# Open3D and pyproj are installed by the core requirements above.
+```
+
+For the optional Phase 1 segmentation and Phase 2 SfM adapters:
+
+```powershell
+pip install -r phase1_ingestion/requirements.txt
+pip install -r phase2_pose/requirements.txt
 ```
 
 > **Note:** The pipeline degrades gracefully. If `torch`/`transformers` or CUDA/`gsplat` are missing, it automatically falls back to documented NumPy consolidation and stand-in depth models without crashing.
 
 ---
 
-## 3. Quickstart: Running in Mock Mode (No GPU Needed, ~1 Min)
+## 3. Quickstart: Running the Complete Demo (No GPU Needed)
 
 You can run the entire pipeline end-to-end on a synthetic test scene without needing real drone footage or heavy model weights:
 
 ```bash
 python -m phase3_reconstruction.run --mock
+python -m phase4_geospatial.run_phase4 --input phase3_reconstruction/output/splat_scene.ply --out phase4_geospatial/output
 ```
 
 ### What this does:
@@ -78,7 +85,18 @@ python -m phase3_reconstruction.run --mock
 
 ---
 
-## 4. Running on Real Upstream Data
+## 4. Running the Full Pipeline on a Real Flight
+
+Run these commands from the repository root:
+
+```powershell
+python -m phase1_ingestion.phase1_ingest --video flight.mp4 --gps-log flight.csv --out phase1_ingestion/output
+python -m phase2_pose.pose_estimator --frames-dir phase1_ingestion/output --out phase2_pose/output
+python -m phase3_reconstruction.run --frames-dir phase1_ingestion/output --poses-dir phase2_pose/output --out phase3_reconstruction/output --config configs/default.yaml
+python -m phase4_geospatial.run_phase4 --input phase3_reconstruction/output/splat_scene.ply --out phase4_geospatial/output
+```
+
+## 5. Running Phase 3 directly on existing upstream data
 
 To run on actual video frames from **Phase 1** and camera poses from **Phase 2**:
 
@@ -96,7 +114,7 @@ python -m phase3_reconstruction.run \
 
 ---
 
-## 5. CLI Arguments & Helpful Commands
+## 6. CLI Arguments & Helpful Commands
 
 | Flag | Description | Example Usage |
 |---|---|---|
@@ -110,7 +128,7 @@ python -m phase3_reconstruction.run \
 
 ---
 
-## 6. Output Files & Artifacts
+## 7. Output Files & Artifacts
 
 All outputs are saved to the directory specified by `--out` (default: `phase3_reconstruction/output/`):
 
@@ -125,7 +143,26 @@ All outputs are saved to the directory specified by `--out` (default: `phase3_re
 
 ---
 
-## 7. Running Unit & Integration Tests
+## 8. Start the web platform
+
+In a second terminal, from the repository root:
+
+```powershell
+python -m uvicorn app.main:app --app-dir platform/backend --reload --port 8000
+```
+
+In a third terminal:
+
+```powershell
+cd platform/frontend
+npm install
+npm run dev
+```
+
+Open <http://localhost:3000>. The demo loads automatically. Upload a video and
+optional `.csv`/`.json` telemetry to run the real backend pipeline.
+
+## 9. Running Unit & Integration Tests
 
 Run the test suite via `pytest`:
 
@@ -146,17 +183,17 @@ python -m pytest -v
 
 ---
 
-## 8. Standalone Mock Data Generator Tool
+## 10. Standalone Mock Data Generator Tool
 
 If you want to manually generate or inspect the mock dataset separately:
 
 ```bash
-python tools/generate_mock_input.py --out-dir phase3_reconstruction/mock_data
+python tools/generate_mock_input.py --root phase3_reconstruction/mock_data
 ```
 
 ---
 
-## 9. Troubleshooting & FAQ
+## 11. Troubleshooting & FAQ
 
 - **ModuleNotFoundError: No module named 'phase3_reconstruction'**
   Ensure you are running commands from the repository root directory (`d:\SIH26\Unmapped`) and using `python -m phase3_reconstruction.run ...`.

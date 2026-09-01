@@ -13,14 +13,16 @@ optimising a scene from scratch or needing multi-pass overlap.
 
 ---
 
-## TL;DR — run it now (no GPU, no model weights, ~1 minute)
+## TL;DR — run the complete demo (no GPU, no model weights)
 
 ```bash
-cd phase3_reconstruction
 python -m pip install -r requirements.txt
+python -m pip install -r platform/backend/requirements.txt
 
-# generate a synthetic scene AND run the whole pipeline on it:
+# generate the Phase 3 demo scene:
 python -m phase3_reconstruction.run --mock
+# export the colored, georeferenced Phase 4 mesh:
+python -m phase4_geospatial.run_phase4 --input phase3_reconstruction/output/splat_scene.ply --out phase4_geospatial/output
 ```
 
 Outputs land in `phase3_reconstruction/output/`:
@@ -60,6 +62,30 @@ loudly and recorded in `training_meta.json`.
 ---
 
 ## Running on real upstream data
+
+## Full platform run
+
+Run the complete portable path in order:
+
+```bash
+python -m phase1_ingestion.phase1_ingest --video flight.mp4 --gps-log flight.csv --out phase1_ingestion/output
+python -m phase2_pose.pose_estimator --frames-dir phase1_ingestion/output --out phase2_pose/output
+python -m phase3_reconstruction.run --frames-dir phase1_ingestion/output --poses-dir phase2_pose/output --out phase3_reconstruction/output
+python -m phase4_geospatial.run_phase4 --input phase3_reconstruction/output/splat_scene.ply --out phase4_geospatial/output
+```
+
+For the web platform, start the FastAPI backend and Next.js frontend using the
+commands in `platform/backend/README.md` and `platform/frontend/README.md`.
+The production PostGIS design is in `platform/backend/schema.sql`; local demo
+mode uses SQLite and does not require a database server.
+
+## Optional production adapters
+
+```bash
+pip install -r phase1_ingestion/requirements.txt  # Ultralytics segmentation
+pip install -r phase2_pose/requirements.txt       # PyCOLMAP + FilterPy
+pip install -e ".[depth,gsplat]"                  # Depth Anything / CUDA splats
+```
 
 Same CLI, point it at the real Phase 1 / Phase 2 output folders:
 
