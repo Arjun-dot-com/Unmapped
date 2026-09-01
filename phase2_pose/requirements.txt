@@ -1,0 +1,3 @@
+# Optional higher-accuracy SfM/fusion stack
+pycolmap>=3.10
+filterpy>=1.4
