@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phase3_reconstruction"
+version = "0.1.0"
+description = "Phase 3 - 3D Reconstruction Engine for Unmapped (SIH26158). Single-pass drone video -> metric 3D Gaussian scene."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Team Uncharted - M3" }]
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "opencv-python>=4.6",
+    "Pillow>=9.0",
+    "PyYAML>=6.0",
+    "tqdm>=4.64",
+]
+
+# Heavy / GPU deps are optional. The --mock path and the whole pipeline scaffold
+# run without any of these. Install what your machine supports.
+[project.optional-dependencies]
+depth = [
+    # Depth Anything V2 via HuggingFace transformers (CPU or CUDA).
+    "torch>=2.0",
+    "transformers>=4.40",
+]
+gsplat = [
+    "torch>=2.0",
+    "gsplat>=1.0",
+]
+pointcloud = [
+    "open3d>=0.17",
+]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+phase3-reconstruct = "phase3_reconstruction.run:main"
+
+[tool.setuptools.packages.find]
+include = ["phase3_reconstruction*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

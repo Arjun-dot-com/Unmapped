@@ -1,0 +1,94 @@
+# Phase 3 - default configuration.
+# Every key here maps 1:1 to a dataclass field in phase3_reconstruction/config.py.
+# Override on the CLI with:  --set training.iterations=3000 --set depth.model_size=base
+# ---------------------------------------------------------------------------
+
+seed: 1234
+max_frames: 0            # 0 = use every usable frame
+
+depth:
+  backend: auto           # auto -> Depth Anything V2 if importable, else mock prior
+  model_size: small       # small | base | large  (accuracy vs. speed)
+  checkpoint: ""          # optional HF id or local .pth; "" = default for model_size
+  input_size: 518
+  device: auto            # auto | cpu | cuda
+  mock_use_gt_depth: true # --mock only: use the synthetic GT depth as the "monocular" prior
+  mock_noise_std: 0.02
+  mock_smooth_px: 2.0
+
+fusion:                    # <<< the depth <-> metric-scale calibration (core USP) >>>
+  space: disparity         # align s*mono + o  to 1/z_metric   (affine-invariant inverse depth)
+  solver: ransac           # lstsq | huber | ransac  (ransac = robust to pose/SfM noise)
+  min_points: 20
+  ransac_iters: 200
+  ransac_thresh_m: 0.30
+  huber_delta: 1.0
+  max_depth_m: 500.0
+  min_depth_m: 0.1
+  fallback_to_global: true
+  global_from_median: true
+
+mask:                     # Phase 1 dynamic-object masks (vehicles / people / animals)
+  enabled: true
+  dilate_px: 6
+  treat_missing_as_static: true
+
+init:
+  pixel_stride: 4
+  voxel_size_m: 0.15
+  max_points: 1500000
+  merge_sparse_cloud: true
+  depth_edge_filter: true
+  edge_rel_thresh: 0.05
+  min_confidence_frame: 0.0
+
+training:
+  backend: auto           # auto -> gsplat if importable + CUDA, else numpy fallback
+  iterations: 7000
+  sh_degree: 2
+  lr_means: 0.00016
+  lr_scales: 0.005
+  lr_quats: 0.001
+  lr_opacities: 0.05
+  lr_sh0: 0.0025
+  lr_shN: 0.000125
+  ssim_lambda: 0.2
+  densify_start_iter: 500
+  densify_stop_iter: 4000
+  densify_every: 100
+  densify_grad_thresh: 0.0002
+  prune_opacity_thresh: 0.05
+  reset_opacity_every: 3000
+  random_bg: false
+  train_image_downscale: 1
+  normalize_scene: true
+  normalize_radius: 1.0
+  eval_every: 1000
+  fallback_voxel_size_m: 0.10
+  fallback_outlier_nb: 12
+  fallback_outlier_std: 2.0
+
+confidence:               # occlusion / low-observation flagging (NOT hallucination)
+  depth_consistency_m: 0.5
+  low_obs_threshold: 2
+  angle_diversity_deg: 5.0
+  write_per_point: true
+
+preview:
+  enabled: true
+  width: 960
+  height: 540
+  n_orbit_frames: 72
+  elevation_deg: 28.0
+  radius_scale: 1.6
+  point_radius_px: 2
+  fps: 24
+  background: [8, 10, 14]
+  make_video: true
+
+export:
+  ply_name: splat_scene.ply
+  native_dir: splat_scene_native
+  write_confidence: true
+  drop_low_confidence: false   # brief: flag low-confidence regions, never silently delete
+  max_export_points: 4000000

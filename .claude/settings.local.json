@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/generate_mock_input.py --root phase3_reconstruction/mock_data --frames 12)",
+      "Bash(python -c ' *)",
+      "Bash(python -m phase3_reconstruction.run --mock --regen-mock --max-frames 12)",
+      "Bash(python -m pip install -q pytest)",
+      "Bash(python -m pytest -q)",
+      "Bash(python -m phase3_reconstruction.run --mock --regen-mock --max-frames 12 --log-level INFO)",
+      "Bash(python -m compileall -q phase3_reconstruction tools tests)",
+      "Bash(python -c \"import ast,sys; [ast.parse\\(open\\(p\\).read\\(\\),p\\) for p in __import__\\('glob'\\).glob\\('phase3_reconstruction/**/*.py',recursive=True\\)]; print\\('AST OK'\\)\")"
+    ]
+  }
+}

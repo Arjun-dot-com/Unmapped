@@ -1,0 +1,57 @@
+# Fast toy-scene config: CPU-only, seconds not minutes.
+# Used by `--mock` when no `--config` is given, and by the end-to-end test.
+# ---------------------------------------------------------------------------
+
+seed: 1234
+max_frames: 0
+
+depth:
+  backend: mock
+  mock_use_gt_depth: true
+  mock_noise_std: 0.03
+  mock_smooth_px: 2.0
+
+fusion:
+  space: disparity
+  solver: ransac
+  min_points: 12
+  ransac_iters: 120
+  ransac_thresh_m: 0.25
+  fallback_to_global: true
+
+mask:
+  enabled: true
+  dilate_px: 4
+
+init:
+  pixel_stride: 3
+  voxel_size_m: 0.10
+  max_points: 400000
+  merge_sparse_cloud: true
+  depth_edge_filter: true
+
+training:
+  backend: fallback        # numpy consolidation, no CUDA / gsplat needed
+  iterations: 0
+  normalize_scene: true
+  fallback_voxel_size_m: 0.08
+  fallback_outlier_nb: 10
+  fallback_outlier_std: 2.0
+
+confidence:
+  depth_consistency_m: 0.6
+  low_obs_threshold: 2
+  angle_diversity_deg: 4.0
+
+preview:
+  enabled: true
+  width: 720
+  height: 405
+  n_orbit_frames: 36
+  point_radius_px: 2
+  make_video: true
+  max_render_points: 250000
+
+export:
+  drop_low_confidence: false
+  max_export_points: 2000000

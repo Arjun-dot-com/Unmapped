@@ -1,0 +1,15 @@
+# Core runtime (required for the --mock path and the full pipeline scaffold).
+# The mock end-to-end run needs ONLY these.
+numpy>=1.23
+scipy>=1.9
+opencv-python>=4.6
+Pillow>=9.0
+PyYAML>=6.0
+tqdm>=4.64
+
+# ---------------------------------------------------------------------------
+# Optional, install per hardware. See README "Installation".
+#   pip install "torch>=2.0" transformers    # Depth Anything V2 real inference
+#   pip install "torch>=2.0" gsplat          # real 3D Gaussian Splatting training (needs CUDA)
+#   pip install open3d                       # nicer point-cloud I/O / meshing interop
+# ---------------------------------------------------------------------------
