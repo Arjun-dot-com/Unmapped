@@ -13,10 +13,10 @@ def write_glb(path, vertices, faces, colors=None):
         off=len(blob); blob.extend(np.asarray(a).tobytes()); views.append({"buffer":0,"byteOffset":off,"byteLength":len(blob)-off,"target":target}); return len(views)-1
     pv=add(v,34962); pc=add(c,34962); pi=add(f,34963)
     mn=v.min(0).tolist() if len(v) else [0,0,0]; mx=v.max(0).tolist() if len(v) else [0,0,0]
-    acc=[{"bufferView":pv,"componentType":5126,"count":len(v),"type":"VEC3","min":mn,"max":mx},{"bufferView":pc,"componentType":5126,"count":len(c),"type":"VEC3"},{"bufferView":pi,"componentType":5125,"count":f.size,"type":"SCALAR"}]
+    acc=[{"bufferView":pv,"componentType":5126,"count":len(v),"type":"VEC3","min":mn,"max":mx},{"bufferView":pc,"componentType":5126,"count":len(c),"type":"VEC3","min":c.min(0).tolist() if len(c) else [0,0,0],"max":c.max(0).tolist() if len(c) else [1,1,1]},{"bufferView":pi,"componentType":5125,"count":f.size,"type":"SCALAR"}]
     # Use an unlit material so the reconstructed surface remains readable even
     # without a Cesium globe/terrain light source.
-    gltf={"asset":{"version":"2.0","generator":"Unmapped Phase 4"},"extensionsUsed":["KHR_materials_unlit"],"scene":0,"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0},"indices":2,"mode":4,"material":0}]}],"materials":[{"name":"reconstruction-surface","extensions":{"KHR_materials_unlit":{}},"pbrMetallicRoughness":{"baseColorFactor":[0.12,0.58,0.72,1.0],"metallicFactor":0,"roughnessFactor":0.9}}],"buffers":[{"byteLength":len(blob)}],"bufferViews":views,"accessors":acc}
+    gltf={"asset":{"version":"2.0","generator":"Unmapped Phase 4"},"extensionsUsed":["KHR_materials_unlit"],"scene":0,"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0}],"meshes":[{"primitives":[{"attributes":{"POSITION":0,"COLOR_0":1},"indices":2,"mode":4,"material":0}]}],"materials":[{"name":"reconstruction-surface","extensions":{"KHR_materials_unlit":{}},"pbrMetallicRoughness":{"baseColorFactor":[1.0,1.0,1.0,1.0],"metallicFactor":0,"roughnessFactor":0.82}}],"buffers":[{"byteLength":len(blob)}],"bufferViews":views,"accessors":acc}
     j=json.dumps(gltf,separators=(",",":"),ensure_ascii=False).encode(); j += b" "*((4-len(j)%4)%4); b=bytes(blob)+b"\0"*((4-len(blob)%4)%4)
     out=b"glTF"+struct.pack("<II",2,12+8+len(j)+8+len(b))+struct.pack("<II",len(j),0x4E4F534A)+j+struct.pack("<II",len(b),0x004E4942)+b
     Path(path).write_bytes(out); return str(path)
