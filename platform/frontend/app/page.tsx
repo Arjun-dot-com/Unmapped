@@ -1,3 +1,9 @@
 "use client";
+import {FormEvent,useState} from "react";
 import CesiumViewer from "../components/CesiumViewer";
-export default function Page(){return <main><h1>UNMAPPED · Reality capture</h1><CesiumViewer/></main>}
+
+export default function Page(){
+ const [flightId,setFlightId]=useState("demo"),[video,setVideo]=useState<File|null>(null),[telemetry,setTelemetry]=useState<File|null>(null),[status,setStatus]=useState("");
+ async function submit(e:FormEvent){e.preventDefault();if(!video){setStatus("Select a drone video first.");return}setStatus("Uploading…");const form=new FormData();form.append("video",video);if(telemetry)form.append("telemetry",telemetry);const uploaded=await fetch("/api/flights/upload",{method:"POST",body:form});if(!uploaded.ok){setStatus("Upload failed.");return}const {flight_id}=await uploaded.json();setFlightId(flight_id);setStatus("Starting reconstruction…");const started=await fetch("/api/pipeline/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({flight_id})});const task=await started.json();if(!started.ok){setStatus(task.detail||"Pipeline failed to start.");return}let current="running";while(current==="running"||current==="queued"){await new Promise(r=>setTimeout(r,1500));const s=await fetch(`/api/pipeline/status/${task.task_id}`);const snapshot=await s.json();current=snapshot.status;setStatus(`${snapshot.stage||"processing"}…`)}setStatus(current==="complete"?"Reconstruction ready":"Reconstruction failed")}
+ return <main><h1>UNMAPPED · Reality capture</h1><form className="upload" onSubmit={submit}><label>Training video <input type="file" accept="video/*" onChange={e=>setVideo(e.target.files?.[0]||null)}/></label><label>Telemetry (optional) <input type="file" accept=".json,.csv" onChange={e=>setTelemetry(e.target.files?.[0]||null)}/></label><button type="submit">Upload & reconstruct</button><span>{status}</span></form><CesiumViewer flightId={flightId}/></main>
+}
