@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
+import numpy as np
 from phase3_reconstruction.io.ply import read_ply
 from .mesh_generator import reconstruct_mesh
 from .georeferencer import load_origin, enu_to_wgs84, origin_metadata
@@ -14,6 +15,10 @@ def run_phase4(input_ply, out_dir, manifest=None, poses=None, method="poisson"):
     # Preserve local vertices for accurate client-side measurements.
     meta={"origin":origin_metadata(origin),"vertex_count":len(v),"triangle_count":len(faces),"source":str(input_ply),"asset":"model.glb","tileset":"tileset.json","coordinate_order":"longitude, latitude, altitude"}
     (out/"geospatial_meta.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
+    confidence = p.columns.get("confidence")
+    if confidence is not None:
+        low = xyz[np.asarray(confidence) < 0.5]
+        (out/"low_confidence.json").write_text(json.dumps({"points": low.tolist(), "count": len(low)}), encoding="utf-8")
     return {"glb":glb,"tileset":tiles,"meta":str(out/"geospatial_meta.json"),**meta}
 
 def main(argv=None):

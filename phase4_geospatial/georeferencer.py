@@ -30,7 +30,7 @@ def enu_to_wgs84(xyz, origin):
         tr = Transformer.from_crs(topocentric, "EPSG:4979", always_xy=True)
         lon, lat, alt = tr.transform(pts[:, 0], pts[:, 1], pts[:, 2])
         return np.column_stack((lon, lat, alt))
-    except ImportError:
+    except Exception:
         # Equirectangular approximation is sub-centimetric over a small flight.
         r = 6378137.0; latr = np.deg2rad(lat0)
         lon = lon0 + np.rad2deg(pts[:, 0] / (r * np.cos(latr)))
