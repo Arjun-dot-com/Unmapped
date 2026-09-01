@@ -6,4 +6,8 @@ Run from the repository root:
 uvicorn app.main:app --app-dir platform/backend --reload
 ```
 
-The demo pipeline uses the checked-in Phase 3 PLY as its source asset. A production adapter can replace `_run` with the Phase 1→4 job runner without changing the API contract.
+`POST /api/flights/upload` stores a video and optional telemetry under a generated
+flight ID. For a real run, call `POST /api/pipeline/run` with that ID plus
+`frames_dir` and `poses_dir` pointing to Phase 1 and Phase 2 contract outputs;
+the backend executes Phase 3 and then Phase 4 in a background task. Use
+`{"flight_id":"demo","mock":true}` to view the checked-in demonstration asset.
