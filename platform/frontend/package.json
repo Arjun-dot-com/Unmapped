@@ -1,0 +1,1 @@
+{"name":"unmapped-viewer","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start"},"dependencies":{"@cesium/engine":"^18.0.0","@cesium/widgets":"^8.0.0","@zip.js/zip.js":"2.7.34","next":"^14.2.0","react":"^18.3.0","react-dom":"^18.3.0","typescript":"^5.0.0"},"devDependencies":{"@types/react":"19.2.18"}}
