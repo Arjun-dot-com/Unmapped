@@ -16,6 +16,7 @@ dependencies = [
     "Pillow>=9.0",
     "PyYAML>=6.0",
     "tqdm>=4.64",
+    "pyproj>=3.6",
 ]
 
 # Heavy / GPU deps are optional. The --mock path and the whole pipeline scaffold
@@ -32,6 +33,12 @@ gsplat = [
 ]
 pointcloud = [
     "open3d>=0.17",
+]
+platform = [
+    "fastapi>=0.100",
+    "uvicorn[standard]>=0.23",
+    "python-multipart>=0.0.6",
+    "pydantic>=2.0",
 ]
 dev = [
     "pytest>=7.0",

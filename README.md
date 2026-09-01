@@ -38,10 +38,10 @@ Outputs land in `phase3_reconstruction/output/`:
 
 ## Installation
 
-**Core (required, enough for `--mock` and the full pipeline scaffold):**
+**Core (required for the full Phase 1-5 scaffold):**
 
 ```bash
-pip install -r requirements.txt        # numpy scipy opencv-python Pillow PyYAML tqdm
+pip install -r requirements.txt        # includes pyproj + Open3D for Phase 4 geospatial export
 ```
 
 **Optional, per hardware:**
@@ -49,7 +49,7 @@ pip install -r requirements.txt        # numpy scipy opencv-python Pillow PyYAML
 ```bash
 pip install "torch>=2.0" transformers   # real Depth Anything V2 monocular depth
 pip install "torch>=2.0" gsplat         # real 3D Gaussian Splatting training (needs CUDA)
-pip install open3d                      # nicer point-cloud interop (not required)
+# Open3D is already included above; install it separately only if using a minimal environment.
 ```
 
 The pipeline **degrades gracefully**: if `torch`/`transformers` are missing it

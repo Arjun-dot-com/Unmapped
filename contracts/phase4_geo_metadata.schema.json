@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["origin","vertex_count","triangle_count","asset","tileset"],"properties":{"origin":{"type":"object","required":["lat","lon","alt","crs"]},"vertex_count":{"type":"integer"},"triangle_count":{"type":"integer"},"asset":{"type":"string"},"tileset":{"type":"string"}}}

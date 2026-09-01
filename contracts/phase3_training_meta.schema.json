@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["train_time_seconds","num_frames_used","num_gaussians_final","hardware","notes"]}

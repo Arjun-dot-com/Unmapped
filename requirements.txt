@@ -6,10 +6,11 @@ opencv-python>=4.6
 Pillow>=9.0
 PyYAML>=6.0
 tqdm>=4.64
+pyproj>=3.6
+open3d>=0.17
 
 # ---------------------------------------------------------------------------
 # Optional, install per hardware. See README "Installation".
 #   pip install "torch>=2.0" transformers    # Depth Anything V2 real inference
 #   pip install "torch>=2.0" gsplat          # real 3D Gaussian Splatting training (needs CUDA)
-#   pip install open3d                       # nicer point-cloud I/O / meshing interop
 # ---------------------------------------------------------------------------
