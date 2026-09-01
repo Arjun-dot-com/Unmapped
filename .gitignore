@@ -4,10 +4,16 @@ __pycache__/
 .pytest_cache/
 build/
 dist/
+venv/
+.venv/
+env/
+.env
 
 # Generated artifacts
 /output/
 phase3_reconstruction/output/
+phase3_reconstruction/mock_data/
+phase4_geospatial/output/
 mock_data/
 *.ckpt
 *.pt
@@ -16,3 +22,10 @@ checkpoints/
 # Model weights
 weights/
 *.pth
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.DS_Store
+*.log
