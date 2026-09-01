@@ -1,0 +1,2 @@
+# Optional production segmentation
+ultralytics>=8.2
